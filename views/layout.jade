@@ -1,8 +1,14 @@
-!!!
+doctype html
 html
-  head
-    title= title
-    link(rel='stylesheet', href='/stylesheets/style.css')
-    script(src="/socket.io/socket.io.js")
-    script(src="/javascripts/socket.js")
-  body!= body
+    head
+        title= title
+        link(rel='stylesheet', href='/stylesheets/style.css')
+        script(src="https://code.jquery.com/jquery-3.1.0.js")
+        script(src="/socket.io/socket.io.js")
+        script(src="/javascripts/socket.js")
+        script(src="/javascripts/paper.js")
+        script(src="/javascripts/chat.js")
+        link(rel="stylesheet", href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css")
+
+    body()
+        block content

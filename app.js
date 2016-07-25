@@ -1,35 +1,68 @@
 
-// 1. Express requires these dependencies
+// Express requires these dependencies
 var express = require('express')
   , routes = require('./routes')
-//  , user = require('./routes/user')
+  , user = require('./routes/user')
   , http = require('http')
   , path = require('path');
 
-var app = express.createServer()
+var app = express();
 
-// 2. Configure our application
-app.set('port', 9002);
-app.set('views', __dirname + '/views');
-app.set('view engine', 'jade');
-app.use(express.favicon());
-app.use(express.logger('dev'));
-app.use(express.bodyParser());
-app.use(express.methodOverride());
-app.use(app.router);
-app.use(express.static(path.join(__dirname, 'public')));
+// Configure our application
+app.configure(function(){
+  app.set('port', process.env.PORT || 9002);
+  app.set('views', __dirname + '/views');
+  app.set('view engine', 'jade');
+  app.use(express.favicon());
+  app.use(express.logger('dev'));
+  app.use(express.bodyParser());
+  app.use(express.methodOverride());
+  app.use(app.router);
+  app.use(express.static(path.join(__dirname, 'public')));
+});
 
-// 3. Configure error handling
+// Configure error handling
 app.configure('development', function(){
   app.use(express.errorHandler());
 });
 
-// 4. Setup Routes
+// Setup Routes
 app.get('/', routes.index);
-//app.get('/users', user.list);
+app.get('/users', user.list);
 
-// 5. Enable Socket.io
-var io = require('socket.io')(app);
-app.listen(9002, function() {
-  console.log("Express server listening on port " + app.get('port'));
+// Enable Socket.io
+var server = http.createServer(app).listen( app.get('port') );
+var io = require('socket.io').listen( server );
+
+// A user connects to the server (opens a socket)
+io.sockets.on('connection', function (socket) {
+
+  // (2): The server recieves a ping event
+  // from the browser on this socket
+  socket.on('ping', function ( data ) {
+  
+    console.log('socket: server recieves ping (2)');
+
+    // (3): Emit a pong event all listening browsers
+    // with the data from the ping event
+    io.sockets.emit( 'pong', data );   
+    
+    console.log('socket: server sends pong to all (3)');
+
+  });
+
+  socket.on( 'drawCircle', function( data, session ) {
+
+    console.log( "session " + session + " drew:");
+
+    socket.broadcast.emit( 'drawCircle', data );
+
+  });
+
+  socket.on('sendMessage', function(data, session) {
+      console.log("Message: "+data);
+      io.sockets.emit('message', data);
+      //socket.broadcast.emit('message', data);
+  });
+
 });
