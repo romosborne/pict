@@ -1,16 +1,14 @@
 extends layout
 block content
-    div(class="jumbotron")
-        h1 Hey
-    div(class="chat-pane")
-        h1 chat
-        textarea( id="chatWindow") Hey!
-        div(class="row")
+    div(class="row")
+        div(class="chat-pane col-md-3")
+            h1 chat
+            textarea( id="chatWindow") Hey!
             div(class="input-group")
                 input(id="messageBox", type="text", class="form-control")
                 span(class="input-group-btn")
                     button(class="btn btn-default", type="button", id="submit") Send
-    div(class="canvas-pane")
-        h1 canvas
-        //canvas( id="draw", resize="true", keepalive="true" )
-        //script( type="text/paperscript", src="javascripts/draw.js", canvas="draw")
+        div(class="canvas-pane col-md-9")
+            h1 canvas
+            canvas( id="draw", resize="true", keepalive="true" )
+            script( type="text/paperscript", src="javascripts/draw.js", canvas="draw")
