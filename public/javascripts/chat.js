@@ -1,4 +1,15 @@
+var username = "";
+
 $(document).ready(function(){
+
+    $("#usernameModal").modal('show');
+
+    $('#enter-username').click(function(){
+        username = $("#username-input").val();
+        $('#username').append(username);
+    });
+
+
     $('#submit').click(function(){
         sendMessage();
     });
@@ -21,7 +32,8 @@ function sendMessage(){
       
         // An object to describe the circle's draw data
         var data = {
-            message: text
+            message: text,
+            username: username
         };
     
       // send a 'drawCircle' event with data and sessionId to the server

@@ -14,7 +14,7 @@ io.on('pong', function (data) {
 
 io.on('message', function (data) {
     console.log('received message: ', data);
-    $('#chat-list').append("<li class='single-message'>"+data.message+"</li>");
+    $('#chat-list').append("<li class='single-message'>"+data.username+": "+ data.message+"</li>");
     var chatWindow = $("#chatWindow");
     var height = chatWindow[0].scrollHeight;
     chatWindow.scrollTop(height);
