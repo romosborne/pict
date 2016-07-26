@@ -1,9 +1,10 @@
 extends layout
 block content
-    div(class="row")
+    div(class="row megadiv")
         div(class="chat-pane col-md-3")
             h1 chat
-            textarea( id="chatWindow") Hey!
+            div( id="chatWindow")
+                ul( id="chat-list")
             div(class="input-group")
                 input(id="messageBox", type="text", class="form-control")
                 span(class="input-group-btn")

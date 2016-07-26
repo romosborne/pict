@@ -1,4 +1,4 @@
-html{
+html {
     height: 100%;
 }
 
@@ -10,6 +10,7 @@ body {
 
 textarea {
     resize: none;
+    height: 60%;
     overflow: hidden;
 }
 
@@ -19,4 +20,18 @@ a {
 
 #chatWindow {
     width: 100%;
+    height: 100%;
+    overflow-y: hidden;
+}
+
+.chat-message{
+}
+
+.chat-pane {
+    height: 75%;
+    min-height: 400px;
+}
+
+.megadiv {
+    height: 100%;
 }
