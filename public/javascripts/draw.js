@@ -1,8 +1,11 @@
-
+$(document).ready(function(){
+    paper.install(window);
+    paper.setup('draw');
+});
 // The faster the user moves their mouse
 // the larger the circle will be
 // We dont want it to be larger than this
-tool.maxDistance = 50;
+//tool.maxDistance = 50;
 
 
 // Returns an object specifying a semi-random color
@@ -43,17 +46,31 @@ function onMouseDrag(event) {
 
 }
 
+function onMouseUp(event){
+    var p1 = event.downPoint;
+    var p2 = event.point;
+    var color = randomColor();
+    drawRectangle(p1.x, p1.y, p2.x, p2.y, color);
+    emitRectangle(p1.x, p1.y, p2.x, p2.y, color);
+}
+
 
 function drawCircle( x, y, radius, color ) {
 
   // Render the circle with Paper.js
-  var circle = new Path.Circle( new Point( x, y ), radius );
+  var circle = new paper.Path.Circle( new Point( x, y ), radius );
   circle.fillColor = new RgbColor( color.red, color.green, color.blue, color.alpha );
 
   // Refresh the view, so we always get an update, even if the tab is not in focus
-  view.draw();
+  paper.view.draw();
 } 
-  
+ 
+function drawRectangle(x1, y1, x2, y2, color){
+    console.log("drawing rectangle!");
+    var rectangle = new paper.Path.Rectangle(new Point(x1, y1), new Point(x2, y2));
+    rectangle.fillColor = new RgbColor(color.red, color.green, color.blue, color.alpha);
+    paper.view.draw();
+}
 
 // This function sends the data for a circle to the server
 // so that the server can broadcast it to every other user
@@ -78,6 +95,26 @@ function emitCircle( x, y, radius, color ) {
 
 }
 
+function emitRectangle(x1, y1, x2, y2, color){
+    var sessionId = io.socket.sessionid;
+
+    var data = {
+        x1: x1,
+        y1: y1,
+        x2: x2,
+        y2: y2,
+        color: color
+    };
+
+    io.emit( 'drawRectangle', data, sessionId);
+    console.log(data);
+}
+
+
+io.on( 'drawRectangle', function( data ){
+    console.log('drawRectangle: ', data);
+    drawRectangle(data.x1, data.y1, data.x2, data.y2, data.color);
+});
 
 // Listen for 'drawCircle' events
 // created by other users
