@@ -41,19 +41,19 @@ io.sockets.on('connection', function (socket) {
   // from the browser on this socket
   socket.on('ping', function ( data ) {
   
-    console.log('socket: server recieves ping (2)');
+   // console.log('socket: server recieves ping (2)');
 
     // (3): Emit a pong event all listening browsers
     // with the data from the ping event
     io.sockets.emit( 'pong', data );   
     
-    console.log('socket: server sends pong to all (3)');
+    //console.log('socket: server sends pong to all (3)');
 
   });
 
   socket.on( 'drawCircle', function( data, session ) {
 
-    console.log( "session " + session + " drew:");
+    //console.log( "session " + session + " drew:");
 
     socket.broadcast.emit( 'drawCircle', data );
 
@@ -64,7 +64,7 @@ io.sockets.on('connection', function (socket) {
   });
 
   socket.on('sendMessage', function(data, session) {
-      console.log("Message: "+data);
+      //console.log("Message: "+data);
       io.sockets.emit('message', data);
       //socket.broadcast.emit('message', data);
   });
