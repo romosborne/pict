@@ -23,13 +23,8 @@ block content
                         button(class="btn btn-default", type="button", id="submit") Send
             div(class="canvas-pane col-md-9")
                 div(class="toolbar")
-                    div(class="btn-group", role="group", data-toggle="buttons")
-                        label(class="btn btn-primary active") Circles
-                            input(type="radio", name="tool", id="circleTool", checked)
-                        label(class="btn btn-primary") Rectangle
-                            input(type="radio", name="tool", id="rectangleTool")
-                        label(class="btn btn-primary") Line
-                            input(type="radio", name="tool", id="lineTool")
+                    input(type="text", id="tool-thickness", class="span2", value="", data-slider-min="10", data-slider-step="1", data-slider-value="30", data-slider-max="60", data-slider-orientation="horizontal", data-slider-selection="after", data-slider-tooltip="hide")
+                    input(type="text", id="tool-thickness-display")
                 div(class="canvas")
                 h1 canvas
                 canvas( id="draw", resize="true", keepalive="true" )

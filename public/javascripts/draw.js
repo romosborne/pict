@@ -1,76 +1,31 @@
-var tool1, tool2;
-
-var circleTool, lineTool, rectangleTool;
+var lineTool;
+var incomingPaths = {};
 
 $(document).ready(function(){
     paper.install(window);
     paper.setup('draw');
 
-    var path;
-    var rectangle;
-    var circle;
+    $('#tool-thickness').slider()
+        .on('slide', function(event){
+            $('#tool-thickness-display').val(event.value);
+            lineTool.thickness=event.value;
+        });
+
     function onMouseDown(event){
-        path = new Path();
-        path.strokeColor=randomColor();
-        path.add(event.point);
+        var color = randomColor();
+        drawNewPath(event.point, lineTool.thickness, color, io.socket.sessionId);
+        emitNewPath(event.point, lineTool.thickness, color);
     }
 
-//    tool1 = new Tool();
-//    tool1.onMouseDown = onMouseDown;
-//
-//    tool1.onMouseDrag = function(event){
-//        path.add(event.point);
-//    }
-//
-    tool2 = new Tool();
-    tool2.minDistance = 20;
-    tool2.onMouseDown = onMouseDown;
-
-    tool2.onMouseDrag = function(event){
-        path.arcTo(event.point);
+    lineTool = new Tool();
+    lineTool.minDistance = 10;
+    lineTool.onMouseDown = onMouseDown;
+    lineTool.onMouseDrag = function(event){
+        appendToPath(event.point, io.socket.sessionId);
+        emitPathPoint(event.point);
     }
-
-    circleTool = new Tool();
-    circleTool.onMouseDown = function(event){
-        circle = new paper.Path.Circle(event.point, 50);
-        circle.fillColor = randomColor();
-    }
-    circleTool.onMouseDrag = function(event){
-        console.log("Hey");
-        circle.radius = event.delta/2;
-    }
-
-    rectangleTool = new Tool();
-    rectangleTool.onMouseDown = function(event){
-        console.log("Hey");
-        rectangle = new Rectangle();
-        rectangle.fillColor = randomColor();
-        rectangle.point = event.point;
-    }
-    rectangleTool.onMouseDrag = function(event){
-        console.log("Hey2");
-        rectangle.width = rectangle.point.x - event.point.x;
-        rectangle.height = rectangle.point.y - event.point.y;
-    }
-//    rectangleTool.activate();
-    circleTool.activate()
-
-    $('#circleTool').click(function(){
-        circleTool.activate();
-    });
-    $('#lineTool').click(function(){
-        lineTool.activate();
-    });
-    $('#rectangleTool').click(function(){
-        rectangleTool.activate();
-    });
-
-//    tool = new Tool();
+    lineTool.activate()
 });
-// The faster the user moves their mouse
-// the larger the circle will be
-// We dont want it to be larger than this
-//tool.maxDistance = 50;
 
 
 // Returns an object specifying a semi-random color
@@ -87,41 +42,7 @@ function randomColor() {
 
 }
 
-
-// every time the user drags their mouse
-// this function will be executed
-//function onMouseDrag(event) {
-//
-//  // Take the click/touch position as the centre of our circle
-//  var x = event.middlePoint.x;
-//  var y = event.middlePoint.y;
-//  
-//  // The faster the movement, the bigger the circle
-//  var radius = event.delta.length / 2;
-//  
-//  // Generate our random color
-//  var color = randomColor();
-//
-//  // Draw the circle 
-//  drawCircle( x, y, radius, color );
-//  
-//   // Pass the data for this circle
-//  // to a special function for later
-//  emitCircle( x, y, radius, color );
-//
-//}
-//
-//function onMouseUp(event){
-//    var p1 = event.downPoint;
-//    var p2 = event.point;
-//    var color = randomColor();
-//    drawRectangle(p1.x, p1.y, p2.x, p2.y, color);
-//    emitRectangle(p1.x, p1.y, p2.x, p2.y, color);
-//}
-
-
 function drawCircle( x, y, radius, color ) {
-
   // Render the circle with Paper.js
   var circle = new paper.Path.Circle( new Point( x, y ), radius );
   circle.fillColor = new RgbColor( color.red, color.green, color.blue, color.alpha );
@@ -131,10 +52,45 @@ function drawCircle( x, y, radius, color ) {
 } 
  
 function drawRectangle(x1, y1, x2, y2, color){
-    //console.log("drawing rectangle!");
     var rectangle = new paper.Path.Rectangle(new Point(x1, y1), new Point(x2, y2));
     rectangle.fillColor = new RgbColor(color.red, color.green, color.blue, color.alpha);
     paper.view.draw();
+}
+
+function drawNewPath(point, thickness, color, sessionId){
+    path = new Path();
+    path.strokeWidth=thickness;
+    path.strokeColor=randomColor();
+    path.add(point);
+    incomingPaths[sessionId] = path;
+    paper.view.draw();
+}
+
+function appendToPath(point, sessionId){
+    incomingPaths[sessionId].add(point);
+    paper.view.draw();
+}
+
+function emitNewPath(point, thickness, color){
+    var sessionId = io.socket.sessionId;
+    var data = {
+        point: point,
+        thickness: thickness,
+        color: color,
+        sessionId: sessionId
+    };
+
+    io.emit('newPath', data, sessionId);
+}
+
+function emitPathPoint(point){
+    var sessionId = io.socket.sessionId;
+    var data = {
+        point: point,
+        sessionId: sessionId
+    };
+
+    io.emit('pathPoint', data, sessionId);
 }
 
 // This function sends the data for a circle to the server
@@ -177,8 +133,15 @@ function emitRectangle(x1, y1, x2, y2, color){
 
 
 io.on( 'drawRectangle', function( data ){
-    //console.log('drawRectangle: ', data);
     drawRectangle(data.x1, data.y1, data.x2, data.y2, data.color);
+});
+
+io.on('newPath', function( data ){
+    drawNewPath(data.point, data.thickness, data.color, data.sessionId);
+});
+
+io.on('pathPoint', function( data ){
+    appendToPath(data.point, data.sessionId)
 });
 
 // Listen for 'drawCircle' events

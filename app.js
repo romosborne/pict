@@ -63,6 +63,14 @@ io.sockets.on('connection', function (socket) {
       socket.broadcast.emit( 'drawRectangle', data);
   });
 
+  socket.on('newPath', function( data, session ){
+      socket.broadcast.emit( 'newPath', data);
+  });
+
+  socket.on('pathPoint', function( data, session){
+      socket.broadcast.emit('pathPoint', data);
+  });
+
   socket.on('sendMessage', function(data, session) {
       //console.log("Message: "+data);
       io.sockets.emit('message', data);
