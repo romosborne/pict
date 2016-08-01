@@ -18,6 +18,7 @@ $(document).ready(function(){
     }
 
     lineTool = new Tool();
+    lineTool.thickness = 20;
     lineTool.minDistance = 10;
     lineTool.onMouseDown = onMouseDown;
     lineTool.onMouseDrag = function(event){
@@ -60,7 +61,8 @@ function drawRectangle(x1, y1, x2, y2, color){
 function drawNewPath(point, thickness, color, sessionId){
     path = new Path();
     path.strokeWidth=thickness;
-    path.strokeColor=randomColor();
+    path.strokeColor=color;
+    path.strokeCap='round';
     path.add(point);
     incomingPaths[sessionId] = path;
     paper.view.draw();
