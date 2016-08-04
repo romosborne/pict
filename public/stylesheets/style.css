@@ -4,8 +4,10 @@ html {
 
 body {
     height:100%;
-    padding: 10px;
     font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+    overflow: hidden;
+    margin: 0;
+    padding: 15px;
 }
 
 textarea {
@@ -31,15 +33,21 @@ canvas {
 
 #chatWindow {
     width: 100%;
-    height: 100%;
+    height: 560px;
     overflow-y: hidden;
 }
 
 .chat-message{
 }
 
+.sender-name{
+    font-weight: bold;
+}
+
+.message-content{}
+
 div.chat-pane {
-    height: 100%;
+    height: 700px;
     border-style: solid;
     border-width: thin;
    /* overflow-y: hidden;*/

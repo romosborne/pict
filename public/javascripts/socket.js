@@ -12,10 +12,3 @@ io.on('pong', function (data) {
 	console.log( 'socket: server said pong (4)', data );
 });
 
-io.on('message', function (data) {
-    console.log('received message: ', data);
-    $('#chat-list').append("<li class='single-message'>"+data.username+": "+ data.message+"</li>");
-    var chatWindow = $("#chatWindow");
-    var height = chatWindow[0].scrollHeight;
-    chatWindow.scrollTop(height);
-});

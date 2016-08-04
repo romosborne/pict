@@ -1,9 +1,11 @@
 var lineTool;
 var incomingPaths = {};
+var incomingTools = {};
 
 $(document).ready(function(){
     paper.install(window);
     paper.setup('draw');
+    paper.view.setViewSize(1000, 600);
 
     $('#tool-thickness').slider()
         .on('slide', function(event){
@@ -18,7 +20,7 @@ $(document).ready(function(){
     }
 
     lineTool = new Tool();
-    lineTool.thickness = 20;
+    lineTool.thickness = 10;
     lineTool.minDistance = 10;
     lineTool.onMouseDown = onMouseDown;
     lineTool.onMouseDrag = function(event){
@@ -27,7 +29,6 @@ $(document).ready(function(){
     }
     lineTool.activate()
 });
-
 
 // Returns an object specifying a semi-random color
 // The color will always have a red value of 0
