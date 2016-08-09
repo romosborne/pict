@@ -39,6 +39,7 @@ app.get('/next-word', function(req, res){
     res.send(game.GetNextWord());
 });
 app.get('/guess/:word', function(req, res){
+//    res.send(req.params.word);
     res.send(game.IsCloseGuess(req.params.word));
 });
 
@@ -66,21 +67,19 @@ var Game = function(){
         var closeGuesses = [];
         if(this.CurrentWord == null) return null;
         if(guess == null) return null;
-        var currentSplits = this.CurrentWord.Split(' ');
-        var guessSplits = guess.Split(' ');
+        var currentSplits = this.CurrentWord.split(' ');
+        var guessSplits = guess.split(' ');
 
-        for(guessSplit in guessSplits){
-            for(currentSplit in currentSplits){
+        guessSplits.forEach(function(guessSplit){
+            currentSplits.forEach(function(currentSplit){
                 if(guessSplit.substring(0, 3).toUpperCase() === currentSplit.substring(0, 3).toUpperCase()){
+                    console.log(guessSplit);
                     closeGuesses.push(guessSplit);
                 }
-            }
-        }
+            });
+        });
 
-        var result = new Set(closeGuesses);
-        if( result.size === 0 ) return null;
-
-        return result;
+        return closeGuesses;
     };
 };
 
