@@ -31,6 +31,16 @@ canvas {
     border-width: thin;
 }
 
+.score-pane{
+    border-style: solid;
+    border-width: thin;
+}
+
+.tool-pane{
+    border-style: solid;
+    border-width: thin;
+}
+
 #chatWindow {
     width: 100%;
     height: 560px;

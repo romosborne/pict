@@ -12,6 +12,19 @@ block content
                             span(class="input-group-btn")
                                 button(class="btn btn-default", type="submit", id="enter-username", data-dismiss="modal") Join
     div(class="container-fluid")
+        div(class="row")
+            div(class="score-pane col-md-3")
+                h1 scores
+                table(id="scores" class="table")
+                    thead
+                        tr
+                            th Name
+                            th Score
+                    tbody(id="scores-body")
+            div(class="tool-pane col-md-9")
+                h1 tools
+                input(type="text", id="tool-thickness", class="span2", value="", data-slider-min="1", data-slider-step="1", data-slider-value="10", data-slider-max="30", data-slider-orientation="horizontal", data-slider-selection="after", data-slider-tooltip="hide")
+                input(type="text", id="tool-thickness-display", value="10")
         div(class="row megadiv")
             div(class="chat-pane col-md-3")
                 h1 chat
@@ -23,9 +36,6 @@ block content
                     span(class="input-group-btn")
                         button(class="btn btn-default", type="button", id="submit") Send
             div(class="canvas-pane col-md-9")
-                div(class="toolbar")
-                    input(type="text", id="tool-thickness", class="span2", value="", data-slider-min="1", data-slider-step="1", data-slider-value="10", data-slider-max="30", data-slider-orientation="horizontal", data-slider-selection="after", data-slider-tooltip="hide")
-                    input(type="text", id="tool-thickness-display", value="10")
                 div(class="canvas")
                 h1 canvas
                 canvas( id="draw", keepalive="true" )

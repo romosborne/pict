@@ -10,9 +10,10 @@ $(document).ready(function(){
 
     $('#enter-username').click(function(){
         username = $("#username-input").val();
+        console.log("sending"+username);
+        io.emit('user-name', username, io.socket.sessionid);
         $('#username').append(username);
     });
-
 
     $('#submit').click(function(){
         sendMessage();
@@ -34,24 +35,34 @@ io.on('message', function (data) {
     chatWindow.scrollTop(height);
 });
 
+io.on('user-join', function (data) {
+    // Nothing at the moment, maybe make an annoying noise later...
+});
+
+io.on('update-scores', function(data){
+    $('#scores-body').empty();
+    console.log(data);
+
+    data.sort(function(a, b){
+        return a.score - b.score
+    });
+
+    data.forEach(function(entry){
+        $('#scores-body').append("<tr><td>"+entry.name+"</td><td>"+entry.score+"</td></tr>");    
+    });
+});
+
 function sendMessage(){
         var text = $('#messageBox').val();
         if (text === "") return;
         $('#messageBox').val('');
     
-        // Each Socket.IO connection has a unique session id
         var sessionId = io.socket.sessionid;
       
-        // An object to describe the circle's draw data
         var data = {
             message: text,
             username: username
         };
     
-      // send a 'drawCircle' event with data and sessionId to the server
       io.emit( 'sendMessage', data, sessionId )
-    
-      // Lets have a look at the data we're sending
-      console.log( data )
-
 }
