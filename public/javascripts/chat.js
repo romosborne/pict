@@ -28,12 +28,21 @@ $(document).ready(function(){
 });
 
 io.on('message', function (data) {
-    console.log('received message: ', data);
     $('#chat-list').append("<li class='single-message'><span class='sender-name'>"+data.username+":</span> <span class='message-content'> "+ data.message+"</span></li>");
     var chatWindow = $("#chatWindow");
     var height = chatWindow[0].scrollHeight;
     chatWindow.scrollTop(height);
 });
+
+io.on('close-guess', function(data){
+    $('#chat-list').append("<li class='close-guess'><span>Your guess was close! " + data.toString() + "</span></li>");
+    var chatWindow = $("#chatWindow");
+    var height = chatWindow[0].scrollHeight;
+    chatWindow.scrollTop(height);
+});
+
+io.on('successful-guess', function(user){
+}
 
 io.on('user-join', function (data) {
     // Nothing at the moment, maybe make an annoying noise later...

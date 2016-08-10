@@ -38,10 +38,6 @@ app.get('/reset', function(req, res){
 app.get('/next-word', function(req, res){
     res.send(game.GetNextWord());
 });
-app.get('/guess/:word', function(req, res){
-//    res.send(req.params.word);
-    res.send(game.IsCloseGuess(req.params.word));
-});
 
 // Enable Socket.io
 var server = http.createServer(app).listen( app.get('port') );
@@ -63,10 +59,24 @@ var Game = function(){
         return item;
     };
 
-    this.IsCloseGuess = function(guess){
+    this.RateGuess = function(guess){
+
+        var Guess = function(){
+            this.Success;
+            this.CloseWords;
+        };
+
+        var output = new Guess();
+
         var closeGuesses = [];
-        if(this.CurrentWord == null) return null;
-        if(guess == null) return null;
+        if(this.CurrentWord === null) return null;
+        if(guess === null) return null;
+
+        if(guess.toUpperCase() === this.CurrentWord.toUpperCase()){
+            output.Success = true;
+            return output;
+        };
+
         var currentSplits = this.CurrentWord.split(' ');
         var guessSplits = guess.split(' ');
 
@@ -79,7 +89,14 @@ var Game = function(){
             });
         });
 
-        return closeGuesses;
+        closeGuesses.reduce(function(p, c){
+            if (p.indexOf(c) < 0) p.push(c);
+            return p;
+        }, []);
+
+        output.CloseWords = closeGuesses;
+
+        return output;
     };
 };
 
@@ -97,8 +114,16 @@ io.sockets.on('connection', function (socket) {
   });
 
   socket.on('sendMessage', function(data, session) {
-
-      io.sockets.emit('message', data);
+      var guess = game.RateGuess(data.message);
+      if (guess.CloseWords.length > 0) {
+          socket.emit('close-guess', guess.CloseWords);
+      }
+      else if(guess.success === true){
+          io.sockets.emit('successful-guess', data.username);
+      }
+      else{
+          io.sockets.emit('message', data);
+      }
   });
 
   socket.on('user-name', function(data, session){
