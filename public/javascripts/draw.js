@@ -27,7 +27,7 @@ $(document).ready(function(){
         appendToPath(event.point, io.socket.sessionId);
         emitPathPoint(event.point);
     }
-    lineTool.activate()
+    lineTool.activate();
 });
 
 // Returns an object specifying a semi-random color
@@ -147,14 +147,17 @@ io.on('pathPoint', function( data ){
     appendToPath(data.point, data.sessionId)
 });
 
-// Listen for 'drawCircle' events
-// created by other users
 io.on( 'drawCircle', function( data ) {
-
-  //console.log( 'drawCircle event recieved:', data );
-
-  // Draw the circle using the data sent
-  // from another user
   drawCircle( data.x, data.y, data.radius, data.color );
-  
-})
+});
+
+io.on('your-turn', function(data){
+    console.log("my turn: " + data);
+    lineTool.activate();
+    $('#word-to-draw').text(data);
+});
+
+io.on('start-turn', function(data){
+    lineTool.remove();
+    $('#word-to-draw').clear();
+});

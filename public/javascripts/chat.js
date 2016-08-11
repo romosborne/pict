@@ -42,7 +42,7 @@ io.on('close-guess', function(data){
 });
 
 io.on('successful-guess', function(user){
-}
+});
 
 io.on('user-join', function (data) {
     // Nothing at the moment, maybe make an annoying noise later...
