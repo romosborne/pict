@@ -50,6 +50,15 @@ app.get('/next-round', function(req, res){
 var server = http.createServer(app).listen( app.get('port') );
 var io = require('socket.io').listen( server );
 
+function findInArray(array, attr, value){
+    for(var i=0; i<array.length; i+=1){
+        if(array[i][attr] === value){
+            return i;
+        }
+    }
+    return -1;
+}
+
 var Game = function(words){
     this.CurrentWord = "";
     
@@ -112,8 +121,14 @@ var Game = function(words){
 
     this.StartGame = function(){};
     this.AddPlayer = function(user){
-        this.Users.push({user:user, score:0, turnsPlayed:0});
+        this.Users.push({user:user, score:0, turnsPlayed:0, ready:false});
     };
+
+    this.SetReady = function(value, id){
+        var index = findInArray(this.Users, 'id', id);
+        this.Users[index].ready = value;
+    };
+
     this.GetNextPlayer = function(){
         var lowestTurn = Math.min(this.Users.map(function(a) {return a.turnsPlayed}));
         if(lowestTurn === this.TurnsPerPlayer) {
@@ -121,9 +136,17 @@ var Game = function(words){
             return;
         }
         var nextPlayer = this.Users.filter(function(a) {a.turnsPlayed === lowestTurn})[0];
-        nextPlayer.turnsPlayed++;
+
+        var nextPlayerIndex = findInArray(this.Users, 'id', nextPlayer.id);
+        this.Users[nextPlayerIndex].turnsPlayer++;
         return nextPlayer;
     };
+
+    this.NextTurn = function(){
+        var nextPlayer = this.GetNextPlayer();
+        var nextWord = this.GetNextWord();
+
+    }
 
     this.EndGame = function(){}
 };
@@ -158,4 +181,8 @@ io.sockets.on('connection', function (socket) {
       game.AddPlayer({id:session.id, name:data});
       io.sockets.emit('update-scores', game.Users);
   });
+
+    socket.on('ready', function(data, session){
+        game.SetReady(data, session.id);
+    });
 });

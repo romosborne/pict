@@ -25,6 +25,15 @@ $(document).ready(function(){
             sendMessage();
         }
     });
+
+    $('#ready-checkbox').click(function(){
+        if($('#ready-checkbox').is(':checked')){
+            io.emit('ready', true, io.socket.sessionid);
+        }
+        else{
+            io.emit('ready', false, io.socket.sessionid);
+        }
+    });
 });
 
 io.on('message', function (data) {
@@ -57,7 +66,7 @@ io.on('update-scores', function(data){
     });
 
     data.forEach(function(entry){
-        $('#scores-body').append("<tr><td>"+entry.name+"</td><td>"+entry.score+"</td></tr>");    
+        $('#scores-body').append("<tr><td>"+entry.user.name+"</td><td>"+entry.score+"</td></tr>");    
     });
 });
 
