@@ -151,19 +151,8 @@ var Game = function(words){
     };
 
     this.GetNextPlayer = function(){
-        var blah = this.Users.map(
-            function(a) {
-                return a.turnsPlayed;
-            });
-
-        console.log(blah);
-
-        console.log("Minminmin: "+Math.min(blah));
-        console.log("Minminmin: "+Math.min.apply(null, blah));
-
         var lowestTurn = Math.min.apply(null, (this.Users.map(
             function(a) {
-                console.log("Turnsplayed: "+a.turnsPlayed);
                 return a.turnsPlayed;
             }
         )));
@@ -177,12 +166,11 @@ var Game = function(words){
 
         var nextPlayer = this.Users.filter(
             function(b){
-                console.log("Turnsplayed"+lowestTurn);
-                console.log("b"+b.turnsPlayed);
                 return (b.turnsPlayed === lowestTurn);
         })[0];
 
         console.log("NextPlayer: "+nextPlayer);
+        console.log("Id: "+nextPlayer.id);
 
         var nextPlayerIndex = findInArray(this.Users, 'id', nextPlayer.id);
         this.Users[nextPlayerIndex].turnsPlayed++;
@@ -193,13 +181,13 @@ var Game = function(words){
         var nextPlayer = this.GetNextPlayer();
         var nextWord = this.GetNextWord();
 
+        io.to(nextPlayer.id).emit('your-turn', nextWord);
+
         console.log("Sending your-turn ("+nextWord+") to "+nextPlayer.id);
-        for(var i=0; i<io.sockets.length; i++){
-            console.log(io.sockets[i].id);
-            if(io.sockets[i].id === nexPlayer.id){
-                io.sockets[i].emit('your-turn', nextWord);
-            }else{
-                io.sockets[i].emit('turn-start', nextPlayer.name);
+        for(var i=0; i<clients.length; i++){
+            console.log(clients[i].id);
+            if(clients[i].id !== nextPlayer.id){
+                io.to(clients[i].id).emit('turn-start', nextPlayer.name);
             }
         }
     }
@@ -210,9 +198,15 @@ var Game = function(words){
 };
 
 var game = new Game(JSON.parse(fs.readFileSync("cinema.json")).words);
+var clients = [];
 
 // A user connects to the server (opens a socket)
 io.sockets.on('connection', function (socket) {
+    clients.push(socket);
+    socket.on('disconnect', function(){
+        clients.splice(clients.indexOf(socket), 1);
+    });
+
   socket.on('newPath', function( data ){
       socket.broadcast.emit( 'newPath', data);
   });
@@ -236,11 +230,11 @@ io.sockets.on('connection', function (socket) {
 
   socket.on('user-name', function(data){
       io.sockets.emit('user-join', data);
-      game.AddPlayer({id:data.sessionId, name:data.name});
+      game.AddPlayer({id:socket.id, name:data.name});
       io.sockets.emit('update-scores', game.Users);
   });
 
     socket.on('ready', function(data){
-        game.SetReady(data.isReady, data.sessionId);
+        game.SetReady(data.isReady, socket.id);
     });
 });

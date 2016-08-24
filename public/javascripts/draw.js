@@ -15,7 +15,7 @@ $(document).ready(function(){
 
     function onMouseDown(event){
         var color = randomColor();
-        drawNewPath(event.point, lineTool.thickness, color, io.socket.sessionId);
+        drawNewPath(event.point, lineTool.thickness, color, io.id);
         emitNewPath(event.point, lineTool.thickness, color);
     }
 
@@ -24,7 +24,7 @@ $(document).ready(function(){
     lineTool.minDistance = 10;
     lineTool.onMouseDown = onMouseDown;
     lineTool.onMouseDrag = function(event){
-        appendToPath(event.point, io.socket.sessionId);
+        appendToPath(event.point, io.id);
         emitPathPoint(event.point);
     }
     lineTool.activate();
@@ -75,69 +75,24 @@ function appendToPath(point, sessionId){
 }
 
 function emitNewPath(point, thickness, color){
-    var sessionId = io.socket.sessionId;
     var data = {
         point: point,
         thickness: thickness,
         color: color,
-        sessionId: sessionId
+        sessionId: io.id
     };
 
-    io.emit('newPath', data, sessionId);
+    io.emit('newPath', data);
 }
 
 function emitPathPoint(point){
-    var sessionId = io.socket.sessionId;
     var data = {
         point: point,
-        sessionId: sessionId
+        sessionId: io.id
     };
 
-    io.emit('pathPoint', data, sessionId);
+    io.emit('pathPoint', data);
 }
-
-// This function sends the data for a circle to the server
-// so that the server can broadcast it to every other user
-function emitCircle( x, y, radius, color ) {
-
-  // Each Socket.IO connection has a unique session id
-  var sessionId = io.socket.sessionid;
-  
-  // An object to describe the circle's draw data
-  var data = {
-    x: x,
-    y: y,
-    radius: radius,
-    color: color
-  };
-
-  // send a 'drawCircle' event with data and sessionId to the server
-  io.emit( 'drawCircle', data, sessionId )
-
-  // Lets have a look at the data we're sending
-  //console.log( data )
-
-}
-
-function emitRectangle(x1, y1, x2, y2, color){
-    var sessionId = io.socket.sessionid;
-
-    var data = {
-        x1: x1,
-        y1: y1,
-        x2: x2,
-        y2: y2,
-        color: color
-    };
-
-    io.emit( 'drawRectangle', data, sessionId);
-    //console.log(data);
-}
-
-
-io.on( 'drawRectangle', function( data ){
-    drawRectangle(data.x1, data.y1, data.x2, data.y2, data.color);
-});
 
 io.on('newPath', function( data ){
     drawNewPath(data.point, data.thickness, data.color, data.sessionId);
@@ -157,7 +112,8 @@ io.on('your-turn', function(data){
     $('#word-to-draw').text(data);
 });
 
-io.on('start-turn', function(data){
+io.on('turn-start', function(data){
+    console.log("turn start");
     lineTool.remove();
-    $('#word-to-draw').clear();
+    $('#word-to-draw').text(data + " drawing...");
 });

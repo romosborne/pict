@@ -10,7 +10,7 @@ $(document).ready(function(){
 
     $('#enter-username').click(function(){
         username = $("#username-input").val();
-        io.emit('user-name', {sessionId:io.id, name:username});
+        io.emit('user-name', {name:username});
         $('#username').append(username);
     });
 
@@ -27,10 +27,10 @@ $(document).ready(function(){
 
     $('#ready-checkbox').click(function(){
         if($('#ready-checkbox').is(':checked')){
-            io.emit('ready', {isReady:true, sessionId:io.id});
+            io.emit('ready', {isReady:true});
         }
         else{
-            io.emit('ready', {isReady:false, sessionId:io.id});
+            io.emit('ready', {isReady:false});
         }
     });
 });
@@ -60,14 +60,6 @@ io.on('game-started', function(data){
     $('#ready-checkbox').attr('disabled', true);
 });
 
-io.on('your-turn', function(data){
-    console.log("It's my turn!");
-});
-
-io.on('turn-start', function(data){
-    console.log("It's "+data+" turn");
-});
-
 io.on('update-scores', function(data){
     $('#scores-body').empty();
 
@@ -85,12 +77,10 @@ function sendMessage(){
         if (text === "") return;
         $('#messageBox').val('');
 
-        var sessionId = io.id;
-
         var data = {
             message: text,
             username: username
         };
 
-      io.emit( 'sendMessage', data, sessionId )
+      io.emit( 'sendMessage', data)
 }
