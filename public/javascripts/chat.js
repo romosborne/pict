@@ -10,7 +10,7 @@ $(document).ready(function(){
 
     $('#enter-username').click(function(){
         username = $("#username-input").val();
-        io.emit('user-name', username, io.id);
+        io.emit('user-name', {sessionId:io.id, name:username});
         $('#username').append(username);
     });
 
@@ -27,10 +27,10 @@ $(document).ready(function(){
 
     $('#ready-checkbox').click(function(){
         if($('#ready-checkbox').is(':checked')){
-            io.emit('ready', true, io.id);
+            io.emit('ready', {isReady:true, sessionId:io.id});
         }
         else{
-            io.emit('ready', false, io.id);
+            io.emit('ready', {isReady:false, sessionId:io.id});
         }
     });
 });
@@ -76,7 +76,7 @@ io.on('update-scores', function(data){
     });
 
     data.forEach(function(entry){
-        $('#scores-body').append("<tr><td>"+entry.name+"</td><td>"+entry.score+"</td></tr>");    
+        $('#scores-body').append("<tr><td>"+entry.name+"</td><td>"+entry.score+"</td></tr>");
     });
 });
 
@@ -84,13 +84,13 @@ function sendMessage(){
         var text = $('#messageBox').val();
         if (text === "") return;
         $('#messageBox').val('');
-    
+
         var sessionId = io.id;
-      
+
         var data = {
             message: text,
             username: username
         };
-    
+
       io.emit( 'sendMessage', data, sessionId )
 }

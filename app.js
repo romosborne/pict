@@ -70,10 +70,10 @@ function findInArray2(array, attr1, attr2, value){
 
 var Game = function(words){
     this.CurrentWord = "";
-    
+
     this.Words = words;
     this.Users = [];
-    
+
     this.WordsDone = [];
 
     this.GetNextWord = function(){
@@ -213,15 +213,15 @@ var game = new Game(JSON.parse(fs.readFileSync("cinema.json")).words);
 
 // A user connects to the server (opens a socket)
 io.sockets.on('connection', function (socket) {
-  socket.on('newPath', function( data, session ){
+  socket.on('newPath', function( data ){
       socket.broadcast.emit( 'newPath', data);
   });
 
-  socket.on('pathPoint', function( data, session){
+  socket.on('pathPoint', function( data){
       socket.broadcast.emit('pathPoint', data);
   });
 
-  socket.on('sendMessage', function(data, session) {
+  socket.on('sendMessage', function(data) {
       var guess = game.RateGuess(data.message);
       if (guess.CloseWords.length > 0) {
           socket.emit('close-guess', guess.CloseWords);
@@ -234,13 +234,13 @@ io.sockets.on('connection', function (socket) {
       }
   });
 
-  socket.on('user-name', function(data, session){
+  socket.on('user-name', function(data){
       io.sockets.emit('user-join', data);
-      game.AddPlayer({id:session, name:data});
+      game.AddPlayer({id:data.sessionId, name:data.name});
       io.sockets.emit('update-scores', game.Users);
   });
 
-    socket.on('ready', function(data, session){
-        game.SetReady(data, session);
+    socket.on('ready', function(data){
+        game.SetReady(data.isReady, data.sessionId);
     });
 });
