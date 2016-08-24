@@ -39,6 +39,7 @@ canvas {
 .tool-pane{
     border-style: solid;
     border-width: thin;
+    padding-bottom: 10px;
 }
 
 #chatWindow {
@@ -65,4 +66,10 @@ div.chat-pane {
 
 .megadiv {
     height: 100%;
+}
+
+#tool-thickness-display {
+  width: 50px;
+  display: inline;
+  margin-left: 10px;
 }

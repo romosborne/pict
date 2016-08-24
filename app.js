@@ -89,7 +89,6 @@ var Game = function(words){
     };
 
     this.RateGuess = function(guess){
-
         var Guess = function(){
             this.Success;
             this.CloseWords;
@@ -197,7 +196,7 @@ var Game = function(words){
     }
 };
 
-var game = new Game(JSON.parse(fs.readFileSync("cinema.json")).words);
+var game = new Game(JSON.parse(fs.readFileSync("wordlist.json")).words);
 var clients = [];
 
 // A user connects to the server (opens a socket)
@@ -217,11 +216,11 @@ io.sockets.on('connection', function (socket) {
 
   socket.on('sendMessage', function(data) {
       var guess = game.RateGuess(data.message);
-      if (guess.CloseWords.length > 0) {
-          socket.emit('close-guess', guess.CloseWords);
-      }
-      else if(guess.success === true){
+
+      if(guess.Success === true){
           io.sockets.emit('successful-guess', data.username);
+      } else if (guess.CloseWords.length > 0) {
+          socket.emit('close-guess', guess.CloseWords);
       }
       else{
           io.sockets.emit('message', data);

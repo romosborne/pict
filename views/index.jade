@@ -1,16 +1,18 @@
 extends layout
 block content
-    div(id="usernameModal", class="modal fade", tabindex="-1", role="dialog")
-        div(class="modal-dialog", role="document")
+    div(id="usernameModal", class="modal fade")
+        div(class="modal-dialog")
             div(class="modal-content")
                 div(class="modal-header")
-                    h4(class="modal-title") Who is you?
+                    h4(class="modal-title") Who is you? (who who? who who?)
                 div(class="modal-body")
+                    div(class="hidden username-empty-message")
+                        div(class="alert alert-danger") pls enter ur name
                     form(id="username-form")
                         div(class="input-group")
-                            input(id="username-input", type="text", class="form-control")
+                            input(id="username-input", type="text", class="form-control", placeholder="I really wanna know!")
                             span(class="input-group-btn")
-                                button(class="btn btn-default", type="submit", id="enter-username", data-dismiss="modal") Join
+                                button(class="btn btn-default", type="submit", id="enter-username") Join
     div(class="container-fluid")
         div(class="row")
             div(class="score-pane col-md-3")
@@ -24,13 +26,13 @@ block content
             div(class="tool-pane col-md-9")
                 h1 tools
                 input(type="text", id="tool-thickness", class="span2", value="", data-slider-min="1", data-slider-step="1", data-slider-value="10", data-slider-max="30", data-slider-orientation="horizontal", data-slider-selection="after", data-slider-tooltip="hide")
-                input(type="text", id="tool-thickness-display", value="10")
+                input(type="text", id="tool-thickness-display", value="10", class="form-control")
         div(class="row megadiv")
             div(class="chat-pane col-md-3")
                 h1 chat
-                div(id="username") Username: 
                 label
                     input(type="checkbox", id="ready-checkbox")
+                    span &nbsp; Gladiator, are you ready??
                 div( id="chatWindow")
                     ul( id="chat-list")
                 div(class="input-group")

@@ -34,7 +34,7 @@ $(document).ready(function(){
 // The color will always have a red value of 0
 // and will be semi-transparent (the alpha value)
 function randomColor() {
-  
+
   return {
     red: 0,
     green: Math.random(),
@@ -51,8 +51,8 @@ function drawCircle( x, y, radius, color ) {
 
   // Refresh the view, so we always get an update, even if the tab is not in focus
   paper.view.draw();
-} 
- 
+}
+
 function drawRectangle(x1, y1, x2, y2, color){
     var rectangle = new paper.Path.Rectangle(new Point(x1, y1), new Point(x2, y2));
     rectangle.fillColor = new RgbColor(color.red, color.green, color.blue, color.alpha);
@@ -116,4 +116,8 @@ io.on('turn-start', function(data){
     console.log("turn start");
     lineTool.remove();
     $('#word-to-draw').text(data + " drawing...");
+});
+
+io.on('successful-guess', function(data){
+    
 });

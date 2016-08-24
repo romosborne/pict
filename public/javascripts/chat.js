@@ -2,16 +2,30 @@ var username = "";
 
 $(document).ready(function(){
 
-    $("#usernameModal").modal('show');
+$('#usernameModal').modal({
+  backdrop: 'static',
+  keyboard: false,
+  show: true
+});
+
+
+    //$("#usernameModal").modal('show');
 
     $("#username-form").submit(function(event){
         event.preventDefault();
     });
 
-    $('#enter-username').click(function(){
+    $('#enter-username').click(function(e,i){
         username = $("#username-input").val();
-        io.emit('user-name', {name:username});
-        $('#username').append(username);
+
+        if(!!username) {
+          io.emit('user-name', {name:username});
+          $('#username').append(username);
+          $("#usernameModal").modal('hide');
+        } else {
+          $('.username-empty-message').removeClass('hidden');
+          e.preventDefault();
+        }
     });
 
     $('#submit').click(function(){
