@@ -10,8 +10,7 @@ $(document).ready(function(){
 
     $('#enter-username').click(function(){
         username = $("#username-input").val();
-        console.log("sending"+username);
-        io.emit('user-name', username, io.socket.sessionid);
+        io.emit('user-name', username, io.id);
         $('#username').append(username);
     });
 
@@ -28,10 +27,10 @@ $(document).ready(function(){
 
     $('#ready-checkbox').click(function(){
         if($('#ready-checkbox').is(':checked')){
-            io.emit('ready', true, io.socket.sessionid);
+            io.emit('ready', true, io.id);
         }
         else{
-            io.emit('ready', false, io.socket.sessionid);
+            io.emit('ready', false, io.id);
         }
     });
 });
@@ -57,16 +56,27 @@ io.on('user-join', function (data) {
     // Nothing at the moment, maybe make an annoying noise later...
 });
 
+io.on('game-started', function(data){
+    $('#ready-checkbox').attr('disabled', true);
+});
+
+io.on('your-turn', function(data){
+    console.log("It's my turn!");
+});
+
+io.on('turn-start', function(data){
+    console.log("It's "+data+" turn");
+});
+
 io.on('update-scores', function(data){
     $('#scores-body').empty();
-    console.log(data);
 
     data.sort(function(a, b){
         return a.score - b.score
     });
 
     data.forEach(function(entry){
-        $('#scores-body').append("<tr><td>"+entry.user.name+"</td><td>"+entry.score+"</td></tr>");    
+        $('#scores-body').append("<tr><td>"+entry.name+"</td><td>"+entry.score+"</td></tr>");    
     });
 });
 
@@ -75,7 +85,7 @@ function sendMessage(){
         if (text === "") return;
         $('#messageBox').val('');
     
-        var sessionId = io.socket.sessionid;
+        var sessionId = io.id;
       
         var data = {
             message: text,

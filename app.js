@@ -59,6 +59,15 @@ function findInArray(array, attr, value){
     return -1;
 }
 
+function findInArray2(array, attr1, attr2, value){
+    for(var i=0; i<array.length; i+=1){
+        if(array[i][attr1][attr2] === value){
+            return i;
+        }
+    }
+    return -1;
+}
+
 var Game = function(words){
     this.CurrentWord = "";
     
@@ -103,7 +112,6 @@ var Game = function(words){
         guessSplits.forEach(function(guessSplit){
             currentSplits.forEach(function(currentSplit){
                 if(guessSplit.substring(0, 3).toUpperCase() === currentSplit.substring(0, 3).toUpperCase()){
-                    console.log(guessSplit);
                     closeGuesses.push(guessSplit);
                 }
             });
@@ -119,26 +127,65 @@ var Game = function(words){
         return output;
     };
 
-    this.StartGame = function(){};
+    this.StartGame = function(){
+        console.log("GameStarted");
+        io.sockets.emit('game-started');
+        this.NextTurn();
+    };
+
     this.AddPlayer = function(user){
-        this.Users.push({user:user, score:0, turnsPlayed:0, ready:false});
+        this.Users.push({id:user.id, name:user.name, score:0, turnsPlayed:0, ready:false});
     };
 
     this.SetReady = function(value, id){
         var index = findInArray(this.Users, 'id', id);
         this.Users[index].ready = value;
+
+        var ready = true;
+        for(var i = 0; i<this.Users.length; i++){
+            ready = ready && this.Users[i].ready;
+        }
+        if(ready===true){
+            this.StartGame();
+        }
     };
 
     this.GetNextPlayer = function(){
-        var lowestTurn = Math.min(this.Users.map(function(a) {return a.turnsPlayed}));
+        var blah = this.Users.map(
+            function(a) {
+                return a.turnsPlayed;
+            });
+
+        console.log(blah);
+
+        console.log("Minminmin: "+Math.min(blah));
+        console.log("Minminmin: "+Math.min.apply(null, blah));
+
+        var lowestTurn = Math.min.apply(null, (this.Users.map(
+            function(a) {
+                console.log("Turnsplayed: "+a.turnsPlayed);
+                return a.turnsPlayed;
+            }
+        )));
+
+        console.log("LowestTurn: "+lowestTurn);
+
         if(lowestTurn === this.TurnsPerPlayer) {
             this.EndGame();
             return;
         }
-        var nextPlayer = this.Users.filter(function(a) {a.turnsPlayed === lowestTurn})[0];
+
+        var nextPlayer = this.Users.filter(
+            function(b){
+                console.log("Turnsplayed"+lowestTurn);
+                console.log("b"+b.turnsPlayed);
+                return (b.turnsPlayed === lowestTurn);
+        })[0];
+
+        console.log("NextPlayer: "+nextPlayer);
 
         var nextPlayerIndex = findInArray(this.Users, 'id', nextPlayer.id);
-        this.Users[nextPlayerIndex].turnsPlayer++;
+        this.Users[nextPlayerIndex].turnsPlayed++;
         return nextPlayer;
     };
 
@@ -146,9 +193,20 @@ var Game = function(words){
         var nextPlayer = this.GetNextPlayer();
         var nextWord = this.GetNextWord();
 
+        console.log("Sending your-turn ("+nextWord+") to "+nextPlayer.id);
+        for(var i=0; i<io.sockets.length; i++){
+            console.log(io.sockets[i].id);
+            if(io.sockets[i].id === nexPlayer.id){
+                io.sockets[i].emit('your-turn', nextWord);
+            }else{
+                io.sockets[i].emit('turn-start', nextPlayer.name);
+            }
+        }
     }
 
-    this.EndGame = function(){}
+    this.EndGame = function(){
+        console.log("GameEnded");
+    }
 };
 
 var game = new Game(JSON.parse(fs.readFileSync("cinema.json")).words);
@@ -178,11 +236,11 @@ io.sockets.on('connection', function (socket) {
 
   socket.on('user-name', function(data, session){
       io.sockets.emit('user-join', data);
-      game.AddPlayer({id:session.id, name:data});
+      game.AddPlayer({id:session, name:data});
       io.sockets.emit('update-scores', game.Users);
   });
 
     socket.on('ready', function(data, session){
-        game.SetReady(data, session.id);
+        game.SetReady(data, session);
     });
 });
