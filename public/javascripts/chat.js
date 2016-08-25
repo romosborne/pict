@@ -64,6 +64,10 @@ io.on('close-guess', function(data){
 });
 
 io.on('successful-guess', function(user){
+    $('#chat-list').append("<li> <span class='message-content'> "+ user +" got it!</span></li>");
+    var chatWindow = $("#chatWindow");
+    var height = chatWindow[0].scrollHeight;
+    chatWindow.scrollTop(height);
 });
 
 io.on('user-join', function (data) {
@@ -78,7 +82,7 @@ io.on('update-scores', function(data){
     $('#scores-body').empty();
 
     data.sort(function(a, b){
-        return a.score - b.score
+        return b.score - a.score
     });
 
     data.forEach(function(entry){

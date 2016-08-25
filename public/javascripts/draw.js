@@ -44,21 +44,6 @@ function randomColor() {
 
 }
 
-function drawCircle( x, y, radius, color ) {
-  // Render the circle with Paper.js
-  var circle = new paper.Path.Circle( new Point( x, y ), radius );
-  circle.fillColor = new RgbColor( color.red, color.green, color.blue, color.alpha );
-
-  // Refresh the view, so we always get an update, even if the tab is not in focus
-  paper.view.draw();
-}
-
-function drawRectangle(x1, y1, x2, y2, color){
-    var rectangle = new paper.Path.Rectangle(new Point(x1, y1), new Point(x2, y2));
-    rectangle.fillColor = new RgbColor(color.red, color.green, color.blue, color.alpha);
-    paper.view.draw();
-}
-
 function drawNewPath(point, thickness, color, sessionId){
     path = new Path();
     path.strokeWidth=thickness;
@@ -110,12 +95,14 @@ io.on('your-turn', function(data){
     console.log("my turn: " + data);
     lineTool.activate();
     $('#word-to-draw').text(data);
+    $('#messageBox').prop('disabled', true);
 });
 
 io.on('turn-start', function(data){
     console.log("turn start");
     lineTool.remove();
     $('#word-to-draw').text(data + " drawing...");
+    $('#messageBox').prop('disabled', false);
 });
 
 io.on('successful-guess', function(data){

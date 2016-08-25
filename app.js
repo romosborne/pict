@@ -69,6 +69,8 @@ function findInArray2(array, attr1, attr2, value){
 }
 
 var Game = function(words){
+    this.GameRunning = false;
+
     this.CurrentWord = "";
 
     this.Words = words;
@@ -129,12 +131,19 @@ var Game = function(words){
     this.StartGame = function(){
         console.log("GameStarted");
         io.sockets.emit('game-started');
+        this.GameRunning = true;
         this.NextTurn();
     };
 
     this.AddPlayer = function(user){
         this.Users.push({id:user.id, name:user.name, score:0, turnsPlayed:0, ready:false});
     };
+
+    this.RemovePlayer = function(id){
+        var index = findInArray(this.Users, 'id', id);
+        this.Users.splice(index, 1);
+    };
+
 
     this.SetReady = function(value, id){
         var index = findInArray(this.Users, 'id', id);
@@ -144,7 +153,7 @@ var Game = function(words){
         for(var i = 0; i<this.Users.length; i++){
             ready = ready && this.Users[i].ready;
         }
-        if(ready===true){
+        if(ready===true && this.GameRunning===false){
             this.StartGame();
         }
     };
@@ -191,6 +200,11 @@ var Game = function(words){
         }
     }
 
+    this.AddPoints = function(id, points){
+        var index = findInArray(this.Users, 'id', id);
+        this.Users[index].score += 10;
+    };
+
     this.EndGame = function(){
         console.log("GameEnded");
     }
@@ -204,6 +218,8 @@ io.sockets.on('connection', function (socket) {
     clients.push(socket);
     socket.on('disconnect', function(){
         clients.splice(clients.indexOf(socket), 1);
+        game.RemovePlayer(socket.id);
+        io.sockets.emit('update-scores', game.Users);
     });
 
   socket.on('newPath', function( data ){
@@ -219,6 +235,10 @@ io.sockets.on('connection', function (socket) {
 
       if(guess.Success === true){
           io.sockets.emit('successful-guess', data.username);
+          game.AddPoints(socket.id, 10);
+          io.sockets.emit('update-scores', game.Users);
+          game.NextTurn();
+
       } else if (guess.CloseWords.length > 0) {
           socket.emit('close-guess', guess.CloseWords);
       }
