@@ -141,9 +141,9 @@ var Game = function(words){
 
     this.RemovePlayer = function(id){
         var index = findInArray(this.Users, 'id', id);
+        console.log("removing " + this.Users[index].name);
         this.Users.splice(index, 1);
     };
-
 
     this.SetReady = function(value, id){
         var index = findInArray(this.Users, 'id', id);
@@ -177,9 +177,6 @@ var Game = function(words){
                 return (b.turnsPlayed === lowestTurn);
         })[0];
 
-        console.log("NextPlayer: "+nextPlayer);
-        console.log("Id: "+nextPlayer.id);
-
         var nextPlayerIndex = findInArray(this.Users, 'id', nextPlayer.id);
         this.Users[nextPlayerIndex].turnsPlayed++;
         return nextPlayer;
@@ -193,7 +190,6 @@ var Game = function(words){
 
         console.log("Sending your-turn ("+nextWord+") to "+nextPlayer.id);
         for(var i=0; i<clients.length; i++){
-            console.log(clients[i].id);
             if(clients[i].id !== nextPlayer.id){
                 io.to(clients[i].id).emit('turn-start', nextPlayer.name);
             }
