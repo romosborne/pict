@@ -79,6 +79,17 @@ function emitPathPoint(point){
     io.emit('pathPoint', data);
 }
 
+function startTimer(timeout, mode){
+    console.log("timeout: " + timeout);
+    $('#circleTimer').circletimer({
+        onComplete: function(){
+            io.emit('timerComplete', mode);
+        },
+        timeout: timeout
+    });
+    $('#circleTimer').circletimer("start");
+}
+
 io.on('newPath', function( data ){
     drawNewPath(data.point, data.thickness, data.color, data.sessionId);
 });
@@ -96,6 +107,7 @@ io.on('your-turn', function(data){
     lineTool.activate();
     $('#word-to-draw').text(data);
     $('#messageBox').prop('disabled', true);
+    startTimer(10000, 'initial');
 });
 
 io.on('turn-start', function(data){
@@ -103,8 +115,9 @@ io.on('turn-start', function(data){
     lineTool.remove();
     $('#word-to-draw').text(data + " drawing...");
     $('#messageBox').prop('disabled', false);
+    startTimer(60000, 'initial');
 });
 
 io.on('successful-guess', function(data){
-    
+    startTimer(20000, 'straggler');
 });

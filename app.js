@@ -138,6 +138,7 @@ var Game = function(words){
 
     this.RemovePlayer = function(id){
         var index = findInArray(this.Users, 'id', id);
+        if(index === -1) return;
         console.log("removing " + this.Users[index].name);
         this.Users.splice(index, 1);
     };
