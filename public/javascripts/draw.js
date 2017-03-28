@@ -13,6 +13,10 @@ $(document).ready(function(){
             lineTool.thickness=event.value;
         });
 
+    $('#clearButton').click(function(){
+        io.emit('clear');
+    });
+
     function onMouseDown(event){
         var color = randomColor();
         drawNewPath(event.point, lineTool.thickness, color, io.id);
@@ -101,6 +105,11 @@ io.on('pathPoint', function( data ){
 io.on( 'drawCircle', function( data ) {
   drawCircle( data.x, data.y, data.radius, data.color );
 });
+
+io.on('clear', function(data){
+    project.activeLayer.removeChildren();
+    paper.view.draw();
+})
 
 io.on('your-turn', function(data){
     console.log("my turn: " + data);
