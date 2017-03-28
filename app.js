@@ -224,6 +224,10 @@ io.sockets.on('connection', function (socket) {
       socket.broadcast.emit('pathPoint', data);
   });
 
+  socket.on('clear', function (data){
+      io.sockets.emit("clear");
+  })
+
   socket.on('sendMessage', function(data) {
       var guess = game.RateGuess(data.message);
 
